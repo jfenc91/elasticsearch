@@ -26,6 +26,14 @@ import org.elasticsearch.index.AbstractIndexComponent;
 import org.elasticsearch.index.Index;
 import org.elasticsearch.index.cache.query.QueryCache;
 import org.elasticsearch.index.settings.IndexSettingsService;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BulkScorer;
+import org.apache.lucene.search.Explanation;
+import org.apache.lucene.search.LRUQueryCache;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Scorer;
 
 public class NoneQueryCache extends AbstractIndexComponent implements QueryCache {
 
@@ -41,8 +49,12 @@ public class NoneQueryCache extends AbstractIndexComponent implements QueryCache
     }
 
     @Override
-    public Weight doCache(Weight weight, QueryCachingPolicy policy) {
-        return weight;
+    public Weight doCache(Query query, IndexSearcher searcher, boolean needsScores,  QueryCachingPolicy policy)  {
+        try {
+            return query.createWeight(searcher, needsScores);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

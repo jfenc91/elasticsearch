@@ -28,7 +28,8 @@ import org.elasticsearch.index.Index;
 import org.elasticsearch.index.cache.query.QueryCache;
 import org.elasticsearch.index.settings.IndexSettingsService;
 import org.elasticsearch.indices.cache.query.IndicesQueryCache;
-
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.IndexSearcher;
 /**
  * The index-level query cache. This class mostly delegates to the node-level
  * query cache: {@link IndicesQueryCache}.
@@ -55,8 +56,8 @@ public class IndexQueryCache extends AbstractIndexComponent implements QueryCach
     }
 
     @Override
-    public Weight doCache(Weight weight, QueryCachingPolicy policy) {
-        return indicesQueryCache.doCache(weight, policy);
+    public Weight doCache(Query query, IndexSearcher searcher, boolean needsScores,  QueryCachingPolicy policy) {
+        return indicesQueryCache.doCache(query, searcher, needsScores, policy);
     }
 
 }

@@ -29,6 +29,7 @@ import org.apache.lucene.search.QueryCache;
 import org.apache.lucene.search.QueryCachingPolicy;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Weight;
+import org.apache.lucene.search.IndexSearcher;
 import org.elasticsearch.common.component.AbstractComponent;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.lucene.ShardCoreKeyMap;
@@ -217,11 +218,8 @@ public class IndicesQueryCache extends AbstractComponent implements QueryCache, 
     }
 
     @Override
-    public Weight doCache(Weight weight, QueryCachingPolicy policy) {
-        while (weight instanceof CachingWeightWrapper) {
-            weight = ((CachingWeightWrapper) weight).in;
-        }
-        final Weight in = cache.doCache(weight, policy);
+    public Weight doCache(Query query, IndexSearcher searcher, boolean needsScores,  QueryCachingPolicy policy) {
+        final Weight in = cache.doCache(query, searcher, needsScores, policy);
         // We wrap the weight to track the readers it sees and map them with
         // the shards they belong to
         return new CachingWeightWrapper(in);
